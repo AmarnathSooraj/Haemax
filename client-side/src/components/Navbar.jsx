@@ -4,12 +4,27 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import tt from '../assets/testtube.png';
 import menu from '../assets/menu.png';
 import close from '../assets/close.png';
+import defaultProfilePic from '../assets/profile.webp'; 
 
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const isNotHome = location.pathname !== '/';
   const [navMenu, setNavMenu] = useState(false);
+  const [profilePic, setProfilePic] = useState(localStorage.getItem("profilePic") || null);
+
+  // Listen for localStorage changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setProfilePic(localStorage.getItem("profilePic"));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   const toggleMenu = () => {
     setNavMenu((prev) => !prev);
@@ -23,6 +38,13 @@ function Navbar() {
   useEffect(() => {
     setNavMenu(false);
   }, [location]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("profilePic");
+    setProfilePic(null);
+    navigate("/login");
+  };
 
   return (
     <nav className={`nav ${navMenu ? 'nav-mobile-open' : ''}`}>
@@ -54,7 +76,7 @@ function Navbar() {
             onClick={() => handleLinkClick('/about')}
             style={{
               cursor: 'pointer',
-              color: location.pathname != '/' ? 'rgba(252, 70, 70, 0.8)' : '#fefefe',
+              color: location.pathname !== '/' ? 'rgba(252, 70, 70, 0.8)' : '#fefefe',
             }}
           >
             About Us
@@ -65,16 +87,31 @@ function Navbar() {
             onClick={() => handleLinkClick('/form')}
             style={{
               cursor: 'pointer',
-              color: location.pathname != '/' ? 'rgba(252, 70, 70, 0.8)' : '#fefefe',
+              color: location.pathname !== '/' ? 'rgba(252, 70, 70, 0.8)' : '#fefefe',
             }}
           >
             Register Donor
           </span>
         </li>
       </ul>
-      <Link to='/login'>
-        <button className='signup-btn'>Login</button>
-      </Link>
+
+      {/* Show profile picture if logged in, otherwise show login button */}
+      {profilePic ? (
+        <div className="profile-container">
+          <img
+            src={profilePic || defaultProfilePic}
+            alt="Profile"
+            className="profile-pic"
+            onClick={() => navigate('/dashboard')} // Navigate to dashboard on click
+            style={{ cursor: 'pointer' }}
+          />
+          <button className="logout-btn" onClick={handleLogout}>Logout</button>
+        </div>
+      ) : (
+        <Link to='/login'>
+          <button className='signup-btn'>Login</button>
+        </Link>
+      )}
     </nav>
   );
 }

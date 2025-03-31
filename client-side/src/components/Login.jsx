@@ -7,11 +7,7 @@ import google from "../assets/google-logo.png";
 
 function Login() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -24,16 +20,20 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-
     setLoading(true);
+
     try {
       const response = await axios.post("http://localhost:5000/api/auth/login", formData);
       
-      // Store the token
+      // Store the token and profile picture
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("profilePic", response.data.profilePic);
+      
+      // Dispatch an event to update the navbar
+      window.dispatchEvent(new Event("storage"));
 
-      // Redirect to dashboard or home
-      navigate("/dashboard");
+      // Navigate to the home page after successful login
+      navigate("/");
     } catch (err) {
       setError(err.response?.data?.error || "Invalid email or password");
     } finally {
@@ -43,7 +43,8 @@ function Login() {
 
   return (
     <div className="login-container">
-      <img className="login-img" src={Image} alt="img" />
+      <img className="login-img" src={Image} alt="Login Illustration" />
+
       <div className="login-form">
         <div className="one">
           <p>
@@ -54,9 +55,9 @@ function Login() {
             Continue with Google
           </button>
         </div>
-        <div>
-          <hr />
-        </div>
+
+        <div><hr /></div>
+
         <form onSubmit={handleLogin}>
           <label>Email address</label>
           <input
@@ -66,6 +67,7 @@ function Login() {
             onChange={handleChange}
             required
           />
+
           <label>Password</label>
           <input
             type="password"
@@ -74,8 +76,13 @@ function Login() {
             onChange={handleChange}
             required
           />
+
           {error && <p className="error">{error}</p>}
-          <button type="submit" disabled={loading}>{loading ? "Logging in..." : "Login"}</button>
+
+          <button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
+
           <p>
             Don't have an account? <Link className="in" to="/signup">Sign up</Link>
           </p>

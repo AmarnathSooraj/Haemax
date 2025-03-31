@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../config/db");
+const authMiddleware = require("../middleware/authMiddleware");
 require("dotenv").config();
 
 const router = express.Router();
@@ -16,7 +17,7 @@ const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS) || 10;
 // User Signup
 router.post("/signup", async (req, res) => {
   console.log("Signup Request Received:", req.body);
-  let { fname, lname, phone, email, password } = req.body;
+  let { fname, lname, phone, email, password, profilePic } = req.body;
 
   if (!fname || !lname || !phone || !email || !password) {
     return res.status(400).json({ error: "All fields are required" });
@@ -29,16 +30,21 @@ router.post("/signup", async (req, res) => {
     const [existingUsers] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
 
     if (existingUsers.length > 0) {
-      return res.status(400).json({ error: "Email already exists" }); // ✅ Improved error message
+      return res.status(400).json({ error: "Email already exists" });
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Insert new user (Fixed column names)
+    // Default profile picture if not provided
+    if (!profilePic) {
+      profilePic = "https://example.com/default-profile.png"; // Replace with your default image URL
+    }
+
+    // Insert new user
     await db.query(
-      "INSERT INTO users (name, lname, phone, email, password) VALUES (?, ?, ?, ?, ?)",
-      [fname, lname, phone, email, hashedPassword]
+      "INSERT INTO users (name, lname, phone, email, password, profilePic) VALUES (?, ?, ?, ?, ?, ?)",
+      [fname, lname, phone, email, hashedPassword, profilePic]
     );
 
     console.log("User registered:", email);
@@ -61,8 +67,8 @@ router.post("/login", async (req, res) => {
   try {
     email = email.toLowerCase();
 
-    // Fetch user
-    const [users] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+    // Fetch user (include profilePic)
+    const [users] = await db.query("SELECT id, email, password, profilePic FROM users WHERE email = ?", [email]);
 
     if (users.length === 0) {
       console.log("Invalid credentials for:", email);
@@ -91,9 +97,28 @@ router.post("/login", async (req, res) => {
     });
 
     console.log("Login successful, token generated for:", email);
-    res.status(200).json({ message: "Login successful", token });
+    res.status(200).json({ 
+      message: "Login successful", 
+      token,
+      profilePic: user.profilePic  // ✅ Include profile picture in response
+    });
+
   } catch (error) {
     console.error("Login Error:", error.message);
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
+});
+
+// Get User Profile
+router.get("/profile", authMiddleware, async (req, res) => {
+  try {
+    const [users] = await db.query("SELECT id, fname, lname, email, phone, profilePic FROM users WHERE id = ?", [req.user.userId]);
+    if (users.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json(users[0]);
+  } catch (error) {
+    console.error("Profile Fetch Error:", error.message);
     res.status(500).json({ error: "Server error", details: error.message });
   }
 });

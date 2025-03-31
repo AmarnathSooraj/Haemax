@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Form.css';
 
 function Form() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login"); // Redirect to login if not authenticated
+    }
+  }, [navigate]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -49,35 +56,30 @@ function Form() {
   };
 
   const checkLastDonatedDate = (lastDonatedDate) => {
-    if (!lastDonatedDate) return true; // ✅ If empty, allow donation.
+    if (!lastDonatedDate) return true;
   
     const lastDonation = new Date(lastDonatedDate);
     const today = new Date();
     const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(today.getMonth() - 3); // 3 months before today
+    threeMonthsAgo.setMonth(today.getMonth() - 3);
   
-    return lastDonation <= threeMonthsAgo; // ✅ Only allow if donation was 3+ months ago.
+    return lastDonation <= threeMonthsAgo;
   };
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate age
     const age = calculateAge(formData.dob);
     if (age < 18) {
       alert("You are not eligible to donate blood (Must be 18 or older).");
       return;
     }
 
-    // Validate last donated date only if it's provided
     if (formData.lastDonatedDate && !checkLastDonatedDate(formData.lastDonatedDate)) {
       alert("You are not eligible to donate. Last donation must be at least 3 months ago.");
       return;
     }
 
-
-    // Eligibility check for health conditions
     if (Object.values(healthConditions).includes(true)) {
       alert("You are not eligible to donate blood due to health conditions.");
       return;
@@ -97,7 +99,7 @@ function Form() {
       }
 
       alert("Form submitted successfully!");
-      navigate('/'); // ✅ Redirect to home page
+      navigate('/'); 
 
       setFormData({
         name: '',

@@ -152,3 +152,74 @@
   .nav.nav-mobile-open ul li span.nav-link-active {
     color: rgb(252, 70, 70);
   }
+  /* Profile Container */
+  .profile-container {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    max-width: 200px;
+    min-width: 120px;
+    max-height: fit-content;
+  }
+  
+  /* Profile Picture */
+  .profile-pic {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(252, 70, 70, 0.8);
+    cursor: pointer;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .profile-pic:hover {
+    transform: scale(1.1);
+    border-color: red;
+  }
+  
+  /* Logout Button */
+  .logout-btn {
+    background: rgba(252, 70, 70, 0.85);
+    color: white !important;
+    border: none;
+    padding: 8px 14px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+  
+  .logout-btn:hover {
+    background: red;
+    color: white;
+    transform: scale(1.07);
+  }
+  
+    @media (max-width: 768px) {
+      .profile-container {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 100px; /* Ensures proper space for profile pic & button */
+        padding: 6px;
+      }
+    
+      .profile-pic {
+        width: 40px;
+        height: 40px;
+      }
+    
+      .logout-btn {
+        width: auto; /* Allows button to adjust to content */
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+    }
+    
+  
+  
