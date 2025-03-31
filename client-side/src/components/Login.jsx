@@ -23,9 +23,11 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", formData);
+      const response = await axios.post("http://localhost:5000/api/auth/login", formData, {
+        withCredentials: true, // Add credentials (cookies) with the request
+      });
       
-      // Store the token and profile picture
+      // Store the token and profile picture in localStorage
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("profilePic", response.data.profilePic);
       

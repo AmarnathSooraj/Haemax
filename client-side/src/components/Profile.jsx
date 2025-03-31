@@ -1,50 +1,68 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios"; // Import axios
 import "./Profile.css";
 import { FaUserEdit, FaEnvelope, FaPhone, FaTint, FaCalendarAlt, FaCheck, FaTimes, FaCamera } from "react-icons/fa";
 
 function Profile() {
-  const [user, setUser] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    bloodGroup: "O+",
-    available: true,
-    profileImage: null,
-    lastDonated: "2024-02-15",
-  });
-
+  const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [updatedUser, setUpdatedUser] = useState(user);
+  const [updatedUser, setUpdatedUser] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
-    // Fetch user profile data from backend API
-    // axios.get('/api/profile').then(response => setUser(response.data));
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem("token"); // Ensure user is authenticated
+        console.log("Token:", token);  // Log token for debugging
+        const response = await axios.get("http://localhost:5000/api/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        if (response.data) {
+          setUser(response.data);
+          setUpdatedUser(response.data); // Set initial values for editing
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);  // Log the error
+      }
+    };
+  
+    fetchUserProfile();
   }, []);
+  
 
   const handleEdit = () => setIsEditing(true);
+
   const handleCancel = () => {
     setUpdatedUser(user);
     setSelectedImage(null);
     setIsEditing(false);
   };
 
-  const handleSave = () => {
-    setUser(updatedUser);
-    if (selectedImage) {
-      setUser((prev) => ({ ...prev, profileImage: selectedImage }));
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put("http://localhost:5000/api/profile", updatedUser, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (selectedImage) {
+        setUpdatedUser((prev) => ({ ...prev, profileImage: selectedImage }));
+      }
+
+      setUser(updatedUser);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
     }
-    setIsEditing(false);
-    // axios.post('/api/profile', updatedUser);
   };
 
   const handleChange = (e) => {
     setUpdatedUser({ ...updatedUser, [e.target.name]: e.target.value });
-  };
-
-  const handleAvailabilityToggle = () => {
-    setUpdatedUser((prev) => ({ ...prev, available: !prev.available }));
   };
 
   const handleImageChange = (e) => {
@@ -58,17 +76,17 @@ function Profile() {
     }
   };
 
+  if (!user) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <div className="profile-container">
-      {/* Left Sidebar */}
       <div className="profile-sidebar">
         <div className="profile-card">
           <div className="profile-photo-section">
             <label htmlFor="profileImage" className="profile-photo">
-              <img
-                src={selectedImage || user.profileImage || "https://via.placeholder.com/150"}
-                alt="Profile"
-              />
+              <img src={selectedImage || user.profilePic || "https://via.placeholder.com/150"} alt="Profile" />
               {isEditing && <FaCamera className="camera-icon" />}
             </label>
             {isEditing && <input type="file" id="profileImage" accept="image/*" onChange={handleImageChange} />}
@@ -77,16 +95,6 @@ function Profile() {
           <h2>{user.firstName} {user.lastName}</h2>
           <p className="blood-group">Blood Group: <strong>{user.bloodGroup}</strong></p>
 
-          <div className="availability-section">
-            <span className={`availability ${updatedUser.available ? "available" : "not-available"}`}>
-              {updatedUser.available ? "Available for Donation" : "Not Available"}
-            </span>
-            <label className="switch">
-              <input type="checkbox" checked={updatedUser.available} onChange={handleAvailabilityToggle} />
-              <span className="slider round"></span>
-            </label>
-          </div>
-
           <div className="donation-status">
             <FaCalendarAlt className="calendar-icon" />
             <p>Last Donated: <strong>{user.lastDonated}</strong></p>
@@ -94,7 +102,6 @@ function Profile() {
         </div>
       </div>
 
-      {/* Main Profile Section */}
       <div className="profile-main">
         <h1>My Profile</h1>
         <div className="profile-info">
