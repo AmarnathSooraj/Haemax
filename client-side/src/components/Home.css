@@ -1,0 +1,180 @@
+.container{
+    padding:0% 8%;
+    max-width:100%;
+}
+.section1{
+    width:100%;
+    display: flex;
+    flex-direction: row;
+    padding:5% 0;
+    justify-content: space-between;
+    align-items: center;
+}
+.des{
+    color:#fefefe;
+    font-size:3rem;
+    max-width: 350px;
+}
+.section2{
+    display: flex;
+    flex-direction: row;
+    justify-content:space-evenly;
+    margin:15% 0 7% 0;
+    a{
+        text-decoration: none;
+        color:#fefefe;
+        button{
+            width:250px;
+            height:80px;
+            font-size: 1.4rem;
+            border:none;
+            color:#fefefe;
+            border-radius:12px;
+            background-color:rgb(231, 67, 67);
+            cursor:pointer;
+        }
+    }
+}
+.section3, .section4{
+    .heading{
+        display:flex;
+        justify-content: center;
+        font-size: 1.6rem;
+        font-weight: 500;
+        letter-spacing: 1px;
+        color:rgb(231, 67, 67);
+    }
+    .content{
+        padding:3% 0;
+        display:flex;
+        flex-direction:row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .list{
+        font-size: 1.2rem;
+        max-width:600px;
+        line-height:40px;
+        letter-spacing: 1px;
+
+        li{
+            list-style:none;
+            align-content: center;
+            span img{
+                width:15px;
+                height:15px;
+                margin:0 5px;
+            }
+        }
+    }
+}
+.section3 .content li{
+    font-weight: 500;
+}
+.section3 .content span{
+    font-weight: 300;
+}
+.section5{
+    margin:4% 15%;
+    background:url('../assets/Rectangle.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding:5% 12%;
+    text-align: center;
+    border-radius: 20px;
+    color:#fefefe;
+    p{
+        font-size: 1.8rem;
+    }
+    button{
+        border:none;
+        cursor:pointer;
+        margin:10px 0;
+        padding:2% 10%;
+        border-radius: 20px;
+        background-color: #fefefe;
+        color:rgb(231, 67, 67);
+    }
+}
+.section6{
+    margin:10% 0;
+    padding:0 7%;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    .heading{
+        margin-top:20px;
+        font-size: 1.9rem;
+        font-weight: 500;
+        letter-spacing: 1px;
+        color:rgb(231, 67, 67);
+    }
+    ul{
+        margin:50px 0;
+        font-size: 1.3rem;
+        align-items: center;
+    }
+    ul li{
+        list-style: decimal;
+        line-height: 40px;
+    }
+    ul li span{
+        font-weight: 500;
+        color:rgb(231, 67, 67);
+    }
+}
+
+@media (max-width : 768px){
+    .container{
+        padding:0% 10%;
+        .section1{
+            flex-direction: column;
+            .des{
+                font-size: 2rem;
+                text-align: center;
+                line-height:3rem;
+                padding:15% 0;
+            }
+            img{
+                width:100%;
+            }
+        }
+        .section2{
+            flex-direction: column;
+            align-items: center;
+            a button{
+                padding:3% 5%;
+                margin:10px 0;
+            }
+        }
+        .section3 .heading , .section4 .heading{
+            font-size: 1.6rem;
+        }
+        .section3 .content , .section4 .content{
+            flex-direction: column;
+            margin:20px 0;
+            .pic{
+                width:350px;
+            }
+        }
+        .section3 , .section4{
+            .list{
+                font-size: 1rem;
+            }
+        }
+        .section5{
+            margin:4% 6%;
+            padding:5% 8%;
+        }
+        .section6{
+            .heading{
+                font-size: 1.4rem;
+            }
+            padding:0 10%;
+            ul{
+                font-size: 1.1rem;
+            }
+        }
+    }
+}
