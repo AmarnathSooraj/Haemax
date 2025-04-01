@@ -3,6 +3,10 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
+    
+app.get('/', (req, res) => {
+    res.send('Welcome to the Haemax API!');
+});
 
 // ✅ Enable CORS with proper settings
 app.use(cors({
